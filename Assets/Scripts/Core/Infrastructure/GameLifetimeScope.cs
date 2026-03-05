@@ -1,4 +1,5 @@
 ﻿using TestGame.Core.Configuration;
+using TestGame.Core.SaveSystem;
 using TestGame.Services;
 using UnityEngine;
 using VContainer;
@@ -27,6 +28,7 @@ namespace TestGame.Core.Infrastructure
         private void RegisterServices(IContainerBuilder builder)
         {
             builder.Register<ITowerService, TowerService>(Lifetime.Singleton);
+            builder.Register<ISaveService, JsonSaveService>(Lifetime.Singleton);
         }
     }
 }
