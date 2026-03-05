@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TestGame.Core.Configuration
@@ -11,6 +12,7 @@ namespace TestGame.Core.Configuration
         public IReadOnlyList<BlockColorEntry> Blocks { get; }
     }
 
+    [Serializable]
     public struct BlockColorEntry
     {
         public string Id;
