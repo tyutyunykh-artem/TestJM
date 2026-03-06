@@ -47,6 +47,11 @@ namespace TestGame.Services
 
         public void DestroyBlock(BlockView block)
         {
+            if (block == null)
+            {
+                return;
+            }
+
             _animationService.StopAnimations(block.RectTransform);
             Object.Destroy(block.gameObject);
         }

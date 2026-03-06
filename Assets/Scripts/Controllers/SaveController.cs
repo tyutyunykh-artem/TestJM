@@ -59,6 +59,12 @@ namespace TestGame.Controllers
         private void TrimBlocksToFitScreen(TowerState state)
         {
             float availableHeight = _towerAreaView.TowerZoneRect.rect.height;
+
+            if (_blockFactory.BlockHeight <= 0f)
+            {
+                return;
+            }
+
             int maxBlocks = Mathf.FloorToInt(availableHeight / _blockFactory.BlockHeight);
 
             while (state.Blocks.Count > maxBlocks)

@@ -37,7 +37,13 @@ namespace TestGame.Presenters
 
         public void Start()
         {
-            _canvas = _scrollAreaView.GetComponentInParent<Canvas>().rootCanvas;
+            Canvas parentCanvas = _scrollAreaView.GetComponentInParent<Canvas>();
+            if (parentCanvas == null)
+            {
+                return;
+            }
+
+            _canvas = parentCanvas.rootCanvas;
             _canvasRect = _canvas.GetComponent<RectTransform>();
             _canvasCamera = _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _canvas.worldCamera;
 

@@ -31,6 +31,11 @@ namespace TestGame.Views
 
         private void ApplySafeArea()
         {
+            if (Screen.width <= 0 || Screen.height <= 0)
+            {
+                return;
+            }
+
             Rect safeArea = Screen.safeArea;
             _lastSafeArea = safeArea;
 

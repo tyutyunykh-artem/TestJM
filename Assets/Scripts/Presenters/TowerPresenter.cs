@@ -29,7 +29,13 @@ namespace TestGame.Presenters
 
         public void Start()
         {
-            _canvasRect = _towerAreaView.GetComponentInParent<Canvas>().rootCanvas.GetComponent<RectTransform>();
+            Canvas canvas = _towerAreaView.GetComponentInParent<Canvas>();
+            if (canvas == null)
+            {
+                return;
+            }
+
+            _canvasRect = canvas.rootCanvas.GetComponent<RectTransform>();
 
             _towerService.OnBlockAdded
                 .Subscribe(entry => OnBlockAddedAsync(entry).Forget())

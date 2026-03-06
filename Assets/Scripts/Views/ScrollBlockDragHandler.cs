@@ -24,6 +24,11 @@ namespace TestGame.Views
         {
             _blockView = GetComponent<BlockView>();
             _scrollRect = GetComponentInParent<ScrollRect>();
+
+            if (_scrollRect == null)
+            {
+                enabled = false;
+            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
