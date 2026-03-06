@@ -67,5 +67,10 @@ namespace TestGame.Services
                 .OnKill(() => source.TrySetResult());
             await source.Task;
         }
+
+        public void StopAnimations(RectTransform block)
+        {
+            DOTween.Kill(block);
+        }
     }
 }

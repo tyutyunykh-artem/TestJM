@@ -15,6 +15,6 @@ namespace TestGame.Services
         public BlockView CreateScrollBlock(BlockData data, Transform parent);
         public BlockView CreateDraggableBlock(BlockData data, Transform parent);
         public BlockView CreateTowerBlock(BlockData data, Transform parent);
-        public void ReturnToPool(BlockView block);
+        public void DestroyBlock(BlockView block);
     }
 }

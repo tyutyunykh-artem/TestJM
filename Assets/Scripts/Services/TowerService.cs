@@ -39,13 +39,14 @@ namespace TestGame.Services
             return entry;
         }
 
-        public void RemoveBlock(int towerIndex)
+        public void RemoveBlock(int towerIndex, float maxHorizontalOffset)
         {
             if (towerIndex < 0 || towerIndex >= State.Blocks.Count)
             {
                 return;
             }
 
+            _maxHorizontalOffset = maxHorizontalOffset;
             State.RemoveAt(towerIndex);
             RecalculateOffsets();
             _onBlockRemoved.OnNext(towerIndex);

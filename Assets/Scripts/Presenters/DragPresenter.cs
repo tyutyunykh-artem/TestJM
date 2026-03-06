@@ -102,7 +102,7 @@ namespace TestGame.Presenters
 
             if (isInTowerZone && !IsTowerAtMaxHeight() && _placementRule.CanPlace(data.BlockData, _towerService.State))
             {
-                _blockFactory.ReturnToPool(clone);
+                _blockFactory.DestroyBlock(clone);
                 float maxOffset = _blockFactory.BlockWidth * 0.5f;
                 float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
                 _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
@@ -112,19 +112,19 @@ namespace TestGame.Presenters
             {
                 ShowLocalizedMessage(LocKeys.ChooseAnotherBlock).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
-                _blockFactory.ReturnToPool(clone);
+                _blockFactory.DestroyBlock(clone);
             }
             else if (isInTowerZone && IsTowerAtMaxHeight())
             {
                 ShowLocalizedMessage(LocKeys.MaxHeightReached).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
-                _blockFactory.ReturnToPool(clone);
+                _blockFactory.DestroyBlock(clone);
             }
             else
             {
                 ShowLocalizedMessage(LocKeys.Miss).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
-                _blockFactory.ReturnToPool(clone);
+                _blockFactory.DestroyBlock(clone);
             }
         }
 
@@ -132,14 +132,15 @@ namespace TestGame.Presenters
         {
             if (IsInsideHoleEllipse(data.ScreenPosition))
             {
-                _blockFactory.ReturnToPool(clone);
-                _towerService.RemoveBlock(data.TowerIndex);
+                _blockFactory.DestroyBlock(clone);
+                float maxOffset = _blockFactory.BlockWidth * 0.5f;
+                _towerService.RemoveBlock(data.TowerIndex, maxOffset);
                 ShowLocalizedMessage(LocKeys.BlockDiscarded).Forget();
             }
             else
             {
                 await _animationService.PlayDisappear(clone.RectTransform);
-                _blockFactory.ReturnToPool(clone);
+                _blockFactory.DestroyBlock(clone);
             }
         }
 

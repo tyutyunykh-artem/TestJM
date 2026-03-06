@@ -15,7 +15,7 @@ namespace TestGame.Services
         public TowerState State { get; }
 
         public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset);
-        public void RemoveBlock(int towerIndex);
+        public void RemoveBlock(int towerIndex, float maxHorizontalOffset);
         public void RestoreState(TowerState loadedState);
     }
 }

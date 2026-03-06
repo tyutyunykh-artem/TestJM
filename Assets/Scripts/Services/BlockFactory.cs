@@ -1,4 +1,3 @@
-using DG.Tweening;
 using TestGame.Model;
 using TestGame.Views;
 using UnityEngine;
@@ -13,6 +12,7 @@ namespace TestGame.Services
     {
         [Inject] private readonly BlockView _blockPrefab;
         [Inject] private readonly IObjectResolver _resolver;
+        [Inject] private readonly IBlockAnimationService _animationService;
 
         public float BlockWidth => _blockPrefab.RectTransform.sizeDelta.x;
         public float BlockHeight => _blockPrefab.RectTransform.sizeDelta.y;
@@ -45,9 +45,9 @@ namespace TestGame.Services
             return block;
         }
 
-        public void ReturnToPool(BlockView block)
+        public void DestroyBlock(BlockView block)
         {
-            DOTween.Kill(block.RectTransform);
+            _animationService.StopAnimations(block.RectTransform);
             Object.Destroy(block.gameObject);
         }
     }

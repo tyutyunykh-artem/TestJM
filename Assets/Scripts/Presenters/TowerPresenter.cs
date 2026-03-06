@@ -75,7 +75,7 @@ namespace TestGame.Presenters
 
             await UniTask.WhenAll(fallTask, slideTask);
 
-            _blockFactory.ReturnToPool(removedView);
+            _blockFactory.DestroyBlock(removedView);
         }
 
         private async UniTask AnimateSlideDown()
@@ -122,7 +122,7 @@ namespace TestGame.Presenters
         {
             foreach (BlockView view in _towerBlockViews)
             {
-                _blockFactory.ReturnToPool(view);
+                _blockFactory.DestroyBlock(view);
             }
 
             _towerBlockViews.Clear();

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using R3;
 
 namespace TestGame.Model
 {
@@ -12,12 +11,10 @@ namespace TestGame.Model
         private readonly List<TowerBlockEntry> _blocks = new();
 
         public IReadOnlyList<TowerBlockEntry> Blocks => _blocks;
-        public ReactiveProperty<int> BlockCount { get; } = new(0);
 
         public void AddBlock(TowerBlockEntry entry)
         {
             _blocks.Add(entry);
-            BlockCount.Value = _blocks.Count;
         }
 
         public void RemoveAt(int index)
@@ -28,13 +25,11 @@ namespace TestGame.Model
             }
 
             _blocks.RemoveAt(index);
-            BlockCount.Value = _blocks.Count;
         }
 
         public void Clear()
         {
             _blocks.Clear();
-            BlockCount.Value = 0;
         }
 
         public TowerBlockEntry GetTop()
