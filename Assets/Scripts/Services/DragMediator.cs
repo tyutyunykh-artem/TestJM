@@ -17,12 +17,14 @@ namespace TestGame.Services
         public Observable<Vector2> OnDragUpdated => _onDragUpdated;
         public Observable<DragEndedData> OnDragEnded => _onDragEnded;
 
-        public void NotifyDragStarted(BlockData blockData, Vector2 screenPosition)
+        public void NotifyDragStarted(BlockData blockData, Vector2 screenPosition, DragSource source, int towerIndex = -1)
         {
             _onDragStarted.OnNext(new DragStartedData
             {
                 BlockData = blockData,
                 ScreenPosition = screenPosition,
+                Source = source,
+                TowerIndex = towerIndex,
             });
         }
 
@@ -31,12 +33,14 @@ namespace TestGame.Services
             _onDragUpdated.OnNext(screenPosition);
         }
 
-        public void NotifyDragEnded(BlockData blockData, Vector2 screenPosition)
+        public void NotifyDragEnded(BlockData blockData, Vector2 screenPosition, DragSource source, int towerIndex = -1)
         {
             _onDragEnded.OnNext(new DragEndedData
             {
                 BlockData = blockData,
                 ScreenPosition = screenPosition,
+                Source = source,
+                TowerIndex = towerIndex,
             });
         }
     }

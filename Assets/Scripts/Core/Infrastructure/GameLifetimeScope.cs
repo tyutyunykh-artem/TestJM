@@ -48,6 +48,7 @@ namespace TestGame.Core.Infrastructure
         {
             builder.RegisterComponentInHierarchy<ScrollAreaView>();
             builder.RegisterComponentInHierarchy<TowerAreaView>();
+            builder.RegisterComponentInHierarchy<HoleView>();
         }
 
         private void RegisterPresenters(IContainerBuilder builder)

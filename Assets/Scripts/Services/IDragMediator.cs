@@ -13,8 +13,8 @@ namespace TestGame.Services
         public Observable<Vector2> OnDragUpdated { get; }
         public Observable<DragEndedData> OnDragEnded { get; }
 
-        public void NotifyDragStarted(BlockData blockData, Vector2 screenPosition);
+        public void NotifyDragStarted(BlockData blockData, Vector2 screenPosition, DragSource source, int towerIndex = -1);
         public void NotifyDragUpdated(Vector2 screenPosition);
-        public void NotifyDragEnded(BlockData blockData, Vector2 screenPosition);
+        public void NotifyDragEnded(BlockData blockData, Vector2 screenPosition, DragSource source, int towerIndex = -1);
     }
 }

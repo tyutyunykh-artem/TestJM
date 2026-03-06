@@ -19,6 +19,7 @@ namespace TestGame.Presenters
         [Inject] private readonly ITowerService _towerService;
         [Inject] private readonly ScrollAreaView _scrollAreaView;
         [Inject] private readonly TowerAreaView _towerAreaView;
+        [Inject] private readonly HoleView _holeView;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -64,10 +65,17 @@ namespace TestGame.Presenters
             _blockFactory.ReturnToPool(_currentClone);
             _currentClone = null;
 
-            HandleDrop(data);
+            if (data.Source == DragSource.Scroll)
+            {
+                HandleScrollBlockDrop(data);
+            }
+            else if (data.Source == DragSource.Tower)
+            {
+                HandleTowerBlockDrop(data);
+            }
         }
 
-        private void HandleDrop(DragEndedData data)
+        private void HandleScrollBlockDrop(DragEndedData data)
         {
             bool isInTowerZone = RectTransformUtility.RectangleContainsScreenPoint(_towerAreaView.TowerZoneRect, data.ScreenPosition, _canvasCamera);
 
@@ -86,6 +94,14 @@ namespace TestGame.Presenters
             _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
         }
 
+        private void HandleTowerBlockDrop(DragEndedData data)
+        {
+            if (IsInsideHoleEllipse(data.ScreenPosition))
+            {
+                _towerService.RemoveBlock(data.TowerIndex);
+            }
+        }
+
         private bool IsTowerAtMaxHeight()
         {
             float blockHeight = _blockFactory.BlockHeight;
@@ -93,6 +109,22 @@ namespace TestGame.Presenters
             float nextHeight = currentHeight + blockHeight;
             float availableHeight = _towerAreaView.TowerZoneRect.rect.height;
             return nextHeight > availableHeight;
+        }
+
+        private bool IsInsideHoleEllipse(Vector2 screenPosition)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_holeView.HoleImageRect, screenPosition, _canvasCamera, out Vector2 localPoint);
+
+            Vector2 size = _holeView.HoleImageRect.rect.size;
+            float rx = size.x * 0.5f;
+            float ry = size.y * 0.5f;
+
+            if (rx <= 0f || ry <= 0f)
+            {
+                return false;
+            }
+
+            return (localPoint.x * localPoint.x) / (rx * rx) + (localPoint.y * localPoint.y) / (ry * ry) <= 1f;
         }
 
         private void MoveCloneToScreenPosition(Vector2 screenPosition)

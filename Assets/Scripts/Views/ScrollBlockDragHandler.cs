@@ -1,4 +1,5 @@
 ﻿using TestGame.Services;
+﻿using TestGame.Model;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,7 +8,7 @@ using VContainer;
 namespace TestGame.Views
 {
     /// <summary>
-    /// Обработчик перетаскивания кубика из скролла.
+    /// Обработчик перетаскивания куба из скролла.
     /// </summary>
     [RequireComponent(typeof(BlockView))]
     public class ScrollBlockDragHandler : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -39,7 +40,7 @@ namespace TestGame.Views
             {
                 _isDragging = true;
                 _scrollRect.enabled = false;
-                _dragMediator.NotifyDragStarted(_blockView.BlockData, eventData.position);
+                _dragMediator.NotifyDragStarted(_blockView.BlockData, eventData.position, DragSource.Scroll);
             }
             else
             {
@@ -66,7 +67,7 @@ namespace TestGame.Views
             {
                 _isDragging = false;
                 _scrollRect.enabled = true;
-                _dragMediator.NotifyDragEnded(_blockView.BlockData, eventData.position);
+                _dragMediator.NotifyDragEnded(_blockView.BlockData, eventData.position, DragSource.Scroll);
             }
             else if (_isScrolling)
             {

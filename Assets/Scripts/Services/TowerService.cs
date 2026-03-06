@@ -19,9 +19,13 @@ namespace TestGame.Services
 
         public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset)
         {
-            float previousOffset = State.Blocks.Count > 0 ? State.GetTop().HorizontalOffset : 0f;
-            float offset = previousOffset + Random.Range(-maxHorizontalOffset, maxHorizontalOffset);
-            offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
+            float offset = 0f;
+            if (State.Blocks.Count > 0)
+            {
+                float previousOffset = State.GetTop().HorizontalOffset;
+                offset = previousOffset + Random.Range(-maxHorizontalOffset, maxHorizontalOffset);
+                offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
+            }
             TowerBlockEntry entry = new TowerBlockEntry(block, offset);
             State.AddBlock(entry);
             _onBlockAdded.OnNext(entry);

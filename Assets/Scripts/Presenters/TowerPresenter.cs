@@ -30,9 +30,11 @@ namespace TestGame.Presenters
 
         private void OnBlockAdded(TowerBlockEntry entry)
         {
+            int index = _towerBlockViews.Count;
             BlockView view = _blockFactory.CreateTowerBlock(entry.Data, _towerAreaView.TowerContainer);
             SetupBlockTransform(view);
-            PositionBlock(view, _towerBlockViews.Count, entry.HorizontalOffset);
+            PositionBlock(view, index, entry.HorizontalOffset);
+            SetTowerIndex(view, index);
             _towerBlockViews.Add(view);
         }
 
@@ -70,6 +72,16 @@ namespace TestGame.Presenters
             {
                 float offset = _towerService.State.Blocks[i].HorizontalOffset;
                 PositionBlock(_towerBlockViews[i], i, offset);
+                SetTowerIndex(_towerBlockViews[i], i);
+            }
+        }
+
+        private void SetTowerIndex(BlockView view, int index)
+        {
+            TowerBlockDragHandler handler = view.GetComponent<TowerBlockDragHandler>();
+            if (handler != null)
+            {
+                handler.SetTowerIndex(index);
             }
         }
 
