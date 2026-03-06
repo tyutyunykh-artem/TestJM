@@ -22,6 +22,7 @@ namespace TestGame.Presenters
         [Inject] private readonly ScrollAreaView _scrollAreaView;
         [Inject] private readonly TowerAreaView _towerAreaView;
         [Inject] private readonly HoleView _holeView;
+        [Inject] private readonly IMessageService _messageService;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -92,9 +93,17 @@ namespace TestGame.Presenters
                 float maxOffset = _blockFactory.BlockWidth * 0.5f;
                 float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
                 _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
+                _messageService.ShowMessage("Кубик установлен!");
+            }
+            else if (isInTowerZone && IsTowerAtMaxHeight())
+            {
+                _messageService.ShowMessage("Башня достигла максимума!");
+                await _animationService.PlayDisappear(clone.RectTransform);
+                _blockFactory.ReturnToPool(clone);
             }
             else
             {
+                _messageService.ShowMessage("Мимо!");
                 await _animationService.PlayDisappear(clone.RectTransform);
                 _blockFactory.ReturnToPool(clone);
             }
@@ -106,6 +115,7 @@ namespace TestGame.Presenters
             {
                 _blockFactory.ReturnToPool(clone);
                 _towerService.RemoveBlock(data.TowerIndex);
+                _messageService.ShowMessage("Кубик выброшен!");
             }
             else
             {

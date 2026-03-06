@@ -38,6 +38,7 @@ namespace TestGame.Core.Infrastructure
             builder.Register<IBlockFactory, BlockFactory>(Lifetime.Singleton);
             builder.Register<IDragMediator, DragMediator>(Lifetime.Singleton);
             builder.Register<IBlockAnimationService, BlockAnimationService>(Lifetime.Singleton);
+            builder.Register<IMessageService, MessageService>(Lifetime.Singleton);
         }
 
         private void RegisterPrefabs(IContainerBuilder builder)
@@ -50,6 +51,7 @@ namespace TestGame.Core.Infrastructure
             builder.RegisterComponentInHierarchy<ScrollAreaView>();
             builder.RegisterComponentInHierarchy<TowerAreaView>();
             builder.RegisterComponentInHierarchy<HoleView>();
+            builder.RegisterComponentInHierarchy<MessageView>();
         }
 
         private void RegisterPresenters(IContainerBuilder builder)
@@ -57,6 +59,7 @@ namespace TestGame.Core.Infrastructure
             builder.RegisterEntryPoint<ScrollPresenter>();
             builder.RegisterEntryPoint<DragPresenter>();
             builder.RegisterEntryPoint<TowerPresenter>();
+            builder.RegisterEntryPoint<MessagePresenter>();
         }
     }
 }
