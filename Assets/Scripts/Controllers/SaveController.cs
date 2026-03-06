@@ -2,7 +2,9 @@
 using Cysharp.Threading.Tasks;
 using R3;
 using TestGame.Core.SaveSystem;
+using TestGame.Model;
 using TestGame.Services;
+using TestGame.Views;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -18,6 +20,8 @@ namespace TestGame.Controllers
 
         [Inject] private readonly ISaveService _saveService;
         [Inject] private readonly ITowerService _towerService;
+        [Inject] private readonly IBlockFactory _blockFactory;
+        [Inject] private readonly TowerAreaView _towerAreaView;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -43,10 +47,23 @@ namespace TestGame.Controllers
                 return;
             }
 
-            Model.TowerState loadedState = await _saveService.Load();
+            TowerState loadedState = await _saveService.Load();
+            TrimBlocksToFitScreen(loadedState);
+
             if (loadedState.Blocks.Count > 0)
             {
                 _towerService.RestoreState(loadedState);
+            }
+        }
+
+        private void TrimBlocksToFitScreen(TowerState state)
+        {
+            float availableHeight = _towerAreaView.TowerZoneRect.rect.height;
+            int maxBlocks = Mathf.FloorToInt(availableHeight / _blockFactory.BlockHeight);
+
+            while (state.Blocks.Count > maxBlocks)
+            {
+                state.RemoveAt(state.Blocks.Count - 1);
             }
         }
 
