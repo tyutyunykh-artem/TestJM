@@ -1,5 +1,5 @@
 ﻿using TestGame.Core.Configuration;
-﻿using TestGame.Controllers;
+using TestGame.Controllers;
 using TestGame.Core.SaveSystem;
 using TestGame.Presenters;
 using TestGame.Services;
@@ -41,6 +41,7 @@ namespace TestGame.Core.Infrastructure
             builder.Register<IDragMediator, DragMediator>(Lifetime.Singleton);
             builder.Register<IBlockAnimationService, BlockAnimationService>(Lifetime.Singleton);
             builder.Register<IMessageService, MessageService>(Lifetime.Singleton);
+            builder.Register<IPlacementRule, PlacementRule>(Lifetime.Singleton);
         }
 
         private void RegisterControllers(IContainerBuilder builder)

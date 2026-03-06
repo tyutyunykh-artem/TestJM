@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TestGame.Core.Configuration
 {
     /// <summary>
-    /// Конфиг списка кубиков.
+    /// Конфиг списка кубов.
     /// </summary>
     [CreateAssetMenu(fileName = "GameConfig", menuName = "Configs/GameConfig")]
     public class GameConfigSO : ScriptableObject, IGameConfig

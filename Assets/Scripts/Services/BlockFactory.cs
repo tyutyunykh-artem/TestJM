@@ -1,4 +1,5 @@
-﻿using TestGame.Model;
+using DG.Tweening;
+using TestGame.Model;
 using TestGame.Views;
 using UnityEngine;
 using VContainer;
@@ -46,6 +47,7 @@ namespace TestGame.Services
 
         public void ReturnToPool(BlockView block)
         {
+            DOTween.Kill(block.RectTransform);
             Object.Destroy(block.gameObject);
         }
     }

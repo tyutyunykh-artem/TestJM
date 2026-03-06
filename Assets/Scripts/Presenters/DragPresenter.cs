@@ -1,5 +1,5 @@
 ﻿using R3;
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using TestGame.Model;
 using TestGame.Services;
@@ -23,6 +23,7 @@ namespace TestGame.Presenters
         [Inject] private readonly TowerAreaView _towerAreaView;
         [Inject] private readonly HoleView _holeView;
         [Inject] private readonly IMessageService _messageService;
+        [Inject] private readonly IPlacementRule _placementRule;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -30,6 +31,7 @@ namespace TestGame.Presenters
         private RectTransform _canvasRect;
         private Camera _canvasCamera;
         private BlockView _currentClone;
+        private bool _isProcessingDrop;
 
         public void Start()
         {
@@ -44,6 +46,11 @@ namespace TestGame.Presenters
 
         private void OnDragStarted(DragStartedData data)
         {
+            if (_isProcessingDrop)
+            {
+                return;
+            }
+
             _currentClone = _blockFactory.CreateDraggableBlock(data.BlockData, _canvasRect);
             MoveCloneToScreenPosition(data.ScreenPosition);
         }
@@ -73,6 +80,8 @@ namespace TestGame.Presenters
 
         private async UniTaskVoid HandleDropAsync(DragEndedData data, BlockView clone)
         {
+            _isProcessingDrop = true;
+
             if (data.Source == DragSource.Scroll)
             {
                 await HandleScrollBlockDrop(data, clone);
@@ -81,19 +90,27 @@ namespace TestGame.Presenters
             {
                 await HandleTowerBlockDrop(data, clone);
             }
+
+            _isProcessingDrop = false;
         }
 
         private async UniTask HandleScrollBlockDrop(DragEndedData data, BlockView clone)
         {
             bool isInTowerZone = RectTransformUtility.RectangleContainsScreenPoint(_towerAreaView.TowerZoneRect, data.ScreenPosition, _canvasCamera);
 
-            if (isInTowerZone && !IsTowerAtMaxHeight())
+            if (isInTowerZone && !IsTowerAtMaxHeight() && _placementRule.CanPlace(data.BlockData, _towerService.State))
             {
                 _blockFactory.ReturnToPool(clone);
                 float maxOffset = _blockFactory.BlockWidth * 0.5f;
                 float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
                 _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
-                _messageService.ShowMessage("Кубик установлен!");
+                _messageService.ShowMessage("Куб установлен!");
+            }
+            else if (isInTowerZone && !_placementRule.CanPlace(data.BlockData, _towerService.State))
+            {
+                _messageService.ShowMessage("Выберите другой куб");
+                await _animationService.PlayDisappear(clone.RectTransform);
+                _blockFactory.ReturnToPool(clone);
             }
             else if (isInTowerZone && IsTowerAtMaxHeight())
             {
@@ -115,7 +132,7 @@ namespace TestGame.Presenters
             {
                 _blockFactory.ReturnToPool(clone);
                 _towerService.RemoveBlock(data.TowerIndex);
-                _messageService.ShowMessage("Кубик выброшен!");
+                _messageService.ShowMessage("Куб выброшен!");
             }
             else
             {

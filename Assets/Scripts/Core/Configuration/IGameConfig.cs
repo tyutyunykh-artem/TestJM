@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TestGame.Core.Configuration
 {
     /// <summary>
-    /// Интерфейс для конфига списка кубиков.
+    /// Интерфейс для конфига списка кубов.
     /// </summary>
     public interface IGameConfig
     {
