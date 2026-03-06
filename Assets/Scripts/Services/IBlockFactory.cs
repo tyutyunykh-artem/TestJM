@@ -9,6 +9,9 @@ namespace TestGame.Services
     /// </summary>
     public interface IBlockFactory
     {
+        public float BlockWidth { get; }
+        public float BlockHeight { get; }
+
         public BlockView CreateScrollBlock(BlockData data, Transform parent);
         public BlockView CreateDraggableBlock(BlockData data, Transform parent);
         public BlockView CreateTowerBlock(BlockData data, Transform parent);

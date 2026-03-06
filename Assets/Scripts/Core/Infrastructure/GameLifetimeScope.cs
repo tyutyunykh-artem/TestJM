@@ -47,12 +47,14 @@ namespace TestGame.Core.Infrastructure
         private void RegisterViews(IContainerBuilder builder)
         {
             builder.RegisterComponentInHierarchy<ScrollAreaView>();
+            builder.RegisterComponentInHierarchy<TowerAreaView>();
         }
 
         private void RegisterPresenters(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<ScrollPresenter>();
             builder.RegisterEntryPoint<DragPresenter>();
+            builder.RegisterEntryPoint<TowerPresenter>();
         }
     }
 }

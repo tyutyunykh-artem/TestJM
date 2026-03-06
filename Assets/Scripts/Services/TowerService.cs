@@ -11,36 +11,32 @@ namespace TestGame.Services
     {
         private readonly Subject<TowerBlockEntry> _onBlockAdded = new();
         private readonly Subject<int> _onBlockRemoved = new();
-        private readonly Subject<string> _onMessage = new();
 
         public Observable<TowerBlockEntry> OnBlockAdded => _onBlockAdded;
         public Observable<int> OnBlockRemoved => _onBlockRemoved;
-        public Observable<string> OnMessage => _onMessage;
 
         public TowerState State { get; } = new();
 
-        public bool CanPlaceBlock(Vector2 screenPosition)
+        public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset)
         {
-            // TODO
-
-            return false;
-        }
-
-        public void PlaceBlock(BlockData block, Vector2 dropScreenPosition)
-        {
-            // TODO
+            float previousOffset = State.Blocks.Count > 0 ? State.GetTop().HorizontalOffset : 0f;
+            float offset = previousOffset + Random.Range(-maxHorizontalOffset, maxHorizontalOffset);
+            offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
+            TowerBlockEntry entry = new TowerBlockEntry(block, offset);
+            State.AddBlock(entry);
+            _onBlockAdded.OnNext(entry);
+            return entry;
         }
 
         public void RemoveBlock(int towerIndex)
         {
-            // TODO
-        }
+            if (towerIndex < 0 || towerIndex >= State.Blocks.Count)
+            {
+                return;
+            }
 
-        public bool IsTowerAtMaxHeight()
-        {
-            // TODO
-
-            return false;
+            State.RemoveAt(towerIndex);
+            _onBlockRemoved.OnNext(towerIndex);
         }
     }
 }

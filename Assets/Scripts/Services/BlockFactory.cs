@@ -13,6 +13,9 @@ namespace TestGame.Services
         [Inject] private readonly BlockView _blockPrefab;
         [Inject] private readonly IObjectResolver _resolver;
 
+        public float BlockWidth => _blockPrefab.RectTransform.sizeDelta.x;
+        public float BlockHeight => _blockPrefab.RectTransform.sizeDelta.y;
+
         public BlockView CreateScrollBlock(BlockData data, Transform parent)
         {
             BlockView block = Object.Instantiate(_blockPrefab, parent);
