@@ -12,6 +12,8 @@ namespace TestGame.Services
         private readonly Subject<TowerBlockEntry> _onBlockAdded = new();
         private readonly Subject<int> _onBlockRemoved = new();
 
+        private float _maxHorizontalOffset;
+
         public Observable<TowerBlockEntry> OnBlockAdded => _onBlockAdded;
         public Observable<int> OnBlockRemoved => _onBlockRemoved;
 
@@ -19,6 +21,8 @@ namespace TestGame.Services
 
         public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset)
         {
+            _maxHorizontalOffset = maxHorizontalOffset;
+
             float offset = 0f;
             if (State.Blocks.Count > 0)
             {
@@ -26,6 +30,7 @@ namespace TestGame.Services
                 offset = previousOffset + Random.Range(-maxHorizontalOffset, maxHorizontalOffset);
                 offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
             }
+
             TowerBlockEntry entry = new TowerBlockEntry(block, offset);
             State.AddBlock(entry);
             _onBlockAdded.OnNext(entry);
@@ -40,7 +45,24 @@ namespace TestGame.Services
             }
 
             State.RemoveAt(towerIndex);
+            RecalculateOffsets();
             _onBlockRemoved.OnNext(towerIndex);
+        }
+
+        private void RecalculateOffsets()
+        {
+            for (int i = 1; i < State.Blocks.Count; i++)
+            {
+                TowerBlockEntry current = State.Blocks[i];
+                TowerBlockEntry below = State.Blocks[i - 1];
+                float diff = current.HorizontalOffset - below.HorizontalOffset;
+
+                if (Mathf.Abs(diff) > _maxHorizontalOffset)
+                {
+                    float clampedDiff = Mathf.Clamp(diff, -_maxHorizontalOffset, _maxHorizontalOffset);
+                    current.SetHorizontalOffset(below.HorizontalOffset + clampedDiff);
+                }
+            }
         }
     }
 }
