@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using TestGame.Core.SaveSystem;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,14 +10,12 @@ namespace TestGame.Editor
     /// </summary>
     public static class SaveCleaner
     {
-        private static readonly string SavePath = Path.Combine(Application.persistentDataPath, "TestGameSave.json");
-
         [MenuItem("Tools/Clear Save Data")]
         public static void DeleteSave()
         {
-            if (File.Exists(SavePath))
+            if (File.Exists(SaveConstants.SavePath))
             {
-                File.Delete(SavePath);
+                File.Delete(SaveConstants.SavePath);
                 Debug.Log($"[{nameof(SaveCleaner)}] Save data deleted");
             }
             else

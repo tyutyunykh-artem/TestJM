@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
@@ -14,8 +15,6 @@ namespace TestGame.Core.SaveSystem
     /// </summary>
     public class JsonSaveService : ISaveService
     {
-        private static readonly string SavePath = Path.Combine(Application.persistentDataPath, "TestGameSave.json");
-
         [Inject] private readonly IGameConfig _gameConfig;
 
         public async UniTask Save(TowerState state)
@@ -30,7 +29,7 @@ namespace TestGame.Core.SaveSystem
             };
 
             string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-            await File.WriteAllTextAsync(SavePath, json);
+            await File.WriteAllTextAsync(SaveConstants.SavePath, json);
         }
 
         public async UniTask<TowerState> Load()
@@ -42,21 +41,29 @@ namespace TestGame.Core.SaveSystem
                 return towerState;
             }
 
-            string json = await File.ReadAllTextAsync(SavePath);
-            SaveData saveData = JsonConvert.DeserializeObject<SaveData>(json);
-
-            if (saveData?.TowerBlocks == null)
+            try
             {
-                return towerState;
+                string json = await File.ReadAllTextAsync(SaveConstants.SavePath);
+                SaveData saveData = JsonConvert.DeserializeObject<SaveData>(json);
+
+                if (saveData?.TowerBlocks == null)
+                {
+                    return towerState;
+                }
+
+                int instanceId = 0;
+                foreach (SavedBlockEntry saved in saveData.TowerBlocks)
+                {
+                    BlockColorEntry colorEntry = _gameConfig.Blocks.FirstOrDefault(b => b.Id == saved.ColorId);
+                    Color color = colorEntry.Id == saved.ColorId ? colorEntry.Color : Color.white;
+                    BlockData blockData = new BlockData(saved.ColorId, color, instanceId++);
+                    TowerBlockEntry entry = new TowerBlockEntry(blockData, saved.HorizontalOffset);
+                    towerState.AddBlock(entry);
+                }
             }
-
-            int instanceId = 0;
-            foreach (SavedBlockEntry saved in saveData.TowerBlocks)
+            catch (Exception)
             {
-                BlockColorEntry colorEntry = _gameConfig.Blocks.FirstOrDefault(b => b.Id == saved.ColorId);
-                BlockData blockData = new BlockData(saved.ColorId, colorEntry.Color, instanceId++);
-                TowerBlockEntry entry = new TowerBlockEntry(blockData, saved.HorizontalOffset);
-                towerState.AddBlock(entry);
+                return new TowerState();
             }
 
             return towerState;
@@ -64,14 +71,14 @@ namespace TestGame.Core.SaveSystem
 
         public bool HasSave()
         {
-            return File.Exists(SavePath);
+            return File.Exists(SaveConstants.SavePath);
         }
 
         public void DeleteSave()
         {
-            if (File.Exists(SavePath))
+            if (File.Exists(SaveConstants.SavePath))
             {
-                File.Delete(SavePath);
+                File.Delete(SaveConstants.SavePath);
             }
         }
     }
