@@ -36,6 +36,7 @@ namespace TestGame.Core.Infrastructure
             builder.Register<ITowerService, TowerService>(Lifetime.Singleton);
             builder.Register<ISaveService, JsonSaveService>(Lifetime.Singleton);
             builder.Register<IBlockFactory, BlockFactory>(Lifetime.Singleton);
+            builder.Register<IDragMediator, DragMediator>(Lifetime.Singleton);
         }
 
         private void RegisterPrefabs(IContainerBuilder builder)
@@ -51,6 +52,7 @@ namespace TestGame.Core.Infrastructure
         private void RegisterPresenters(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<ScrollPresenter>();
+            builder.RegisterEntryPoint<DragPresenter>();
         }
     }
 }
