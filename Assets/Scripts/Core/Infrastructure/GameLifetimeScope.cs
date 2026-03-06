@@ -1,6 +1,8 @@
 ﻿using TestGame.Core.Configuration;
 using TestGame.Core.SaveSystem;
+using TestGame.Presenters;
 using TestGame.Services;
+using TestGame.Views;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -13,11 +15,15 @@ namespace TestGame.Core.Infrastructure
     public class GameLifetimeScope : LifetimeScope
     {
         [SerializeField] private GameConfigSO _gameConfig;
+        [SerializeField] private BlockView _blockPrefab;
 
         protected override void Configure(IContainerBuilder builder)
         {
             RegisterConfiguration(builder);
             RegisterServices(builder);
+            RegisterPrefabs(builder);
+            RegisterViews(builder);
+            RegisterPresenters(builder);
         }
 
         private void RegisterConfiguration(IContainerBuilder builder)
@@ -29,6 +35,22 @@ namespace TestGame.Core.Infrastructure
         {
             builder.Register<ITowerService, TowerService>(Lifetime.Singleton);
             builder.Register<ISaveService, JsonSaveService>(Lifetime.Singleton);
+            builder.Register<IBlockFactory, BlockFactory>(Lifetime.Singleton);
+        }
+
+        private void RegisterPrefabs(IContainerBuilder builder)
+        {
+            builder.RegisterInstance(_blockPrefab);
+        }
+
+        private void RegisterViews(IContainerBuilder builder)
+        {
+            builder.RegisterComponentInHierarchy<ScrollAreaView>();
+        }
+
+        private void RegisterPresenters(IContainerBuilder builder)
+        {
+            builder.RegisterEntryPoint<ScrollPresenter>();
         }
     }
 }

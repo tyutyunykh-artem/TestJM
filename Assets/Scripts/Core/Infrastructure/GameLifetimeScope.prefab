@@ -49,3 +49,4 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   _gameConfig: {fileID: 11400000, guid: 5a0a2bf01e4fed74a9bb58edb00507eb, type: 2}
+  _blockPrefab: {fileID: 572113557088927400, guid: 33dc79eef94d047459079e741151ae9e, type: 3}

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using TestGame.Model;
+﻿using TestGame.Model;
+using TestGame.Views;
+using UnityEngine;
 
 namespace TestGame.Services
 {
@@ -8,8 +9,9 @@ namespace TestGame.Services
     /// </summary>
     public interface IBlockFactory
     {
-        public GameObject CreateDraggableBlock(BlockData data, Transform parent);
-        public GameObject CreateTowerBlock(BlockData data, Transform parent);
-        public void ReturnToPool(GameObject blockObject);
+        public BlockView CreateScrollBlock(BlockData data, Transform parent);
+        public BlockView CreateDraggableBlock(BlockData data, Transform parent);
+        public BlockView CreateTowerBlock(BlockData data, Transform parent);
+        public void ReturnToPool(BlockView block);
     }
 }
