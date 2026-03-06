@@ -1,6 +1,7 @@
 ﻿using R3;
 using Cysharp.Threading.Tasks;
 using System;
+using TestGame.Core.Localization;
 using TestGame.Model;
 using TestGame.Services;
 using TestGame.Views;
@@ -24,6 +25,7 @@ namespace TestGame.Presenters
         [Inject] private readonly HoleView _holeView;
         [Inject] private readonly IMessageService _messageService;
         [Inject] private readonly IPlacementRule _placementRule;
+        [Inject] private readonly ILocalizationService _localizationService;
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -104,23 +106,23 @@ namespace TestGame.Presenters
                 float maxOffset = _blockFactory.BlockWidth * 0.5f;
                 float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
                 _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
-                _messageService.ShowMessage("Куб установлен!");
+                ShowLocalizedMessage(LocKeys.BlockPlaced).Forget();
             }
             else if (isInTowerZone && !_placementRule.CanPlace(data.BlockData, _towerService.State))
             {
-                _messageService.ShowMessage("Выберите другой куб");
+                ShowLocalizedMessage(LocKeys.ChooseAnotherBlock).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
                 _blockFactory.ReturnToPool(clone);
             }
             else if (isInTowerZone && IsTowerAtMaxHeight())
             {
-                _messageService.ShowMessage("Башня достигла максимума!");
+                ShowLocalizedMessage(LocKeys.MaxHeightReached).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
                 _blockFactory.ReturnToPool(clone);
             }
             else
             {
-                _messageService.ShowMessage("Мимо!");
+                ShowLocalizedMessage(LocKeys.Miss).Forget();
                 await _animationService.PlayDisappear(clone.RectTransform);
                 _blockFactory.ReturnToPool(clone);
             }
@@ -132,13 +134,19 @@ namespace TestGame.Presenters
             {
                 _blockFactory.ReturnToPool(clone);
                 _towerService.RemoveBlock(data.TowerIndex);
-                _messageService.ShowMessage("Куб выброшен!");
+                ShowLocalizedMessage(LocKeys.BlockDiscarded).Forget();
             }
             else
             {
                 await _animationService.PlayDisappear(clone.RectTransform);
                 _blockFactory.ReturnToPool(clone);
             }
+        }
+
+        private async UniTask ShowLocalizedMessage(string key)
+        {
+            string message = await _localizationService.GetStringFromCommon(key);
+            _messageService.ShowMessage(message);
         }
 
         private bool IsTowerAtMaxHeight()
