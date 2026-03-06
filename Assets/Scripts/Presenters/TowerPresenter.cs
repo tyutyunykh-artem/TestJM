@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using R3;
 using TestGame.Model;
 using TestGame.Services;
@@ -17,18 +18,30 @@ namespace TestGame.Presenters
     {
         [Inject] private readonly ITowerService _towerService;
         [Inject] private readonly IBlockFactory _blockFactory;
+        [Inject] private readonly IBlockAnimationService _animationService;
         [Inject] private readonly TowerAreaView _towerAreaView;
+        [Inject] private readonly HoleView _holeView;
 
         private readonly CompositeDisposable _disposables = new();
         private readonly List<BlockView> _towerBlockViews = new();
 
+        private RectTransform _canvasRect;
+
         public void Start()
         {
-            _towerService.OnBlockAdded.Subscribe(OnBlockAdded).AddTo(_disposables);
-            _towerService.OnBlockRemoved.Subscribe(OnBlockRemoved).AddTo(_disposables);
+            _canvasRect = _towerAreaView.GetComponentInParent<Canvas>().rootCanvas.GetComponent<RectTransform>();
+
+            _towerService.OnBlockAdded
+                .Subscribe(entry => OnBlockAddedAsync(entry).Forget())
+                .AddTo(_disposables);
+
+            _towerService.OnBlockRemoved
+                .Subscribe(index => OnBlockRemovedAsync(index).Forget())
+                .AddTo(_disposables);
         }
 
-        private void OnBlockAdded(TowerBlockEntry entry)
+
+        private async UniTaskVoid OnBlockAddedAsync(TowerBlockEntry entry)
         {
             int index = _towerBlockViews.Count;
             BlockView view = _blockFactory.CreateTowerBlock(entry.Data, _towerAreaView.TowerContainer);
@@ -36,9 +49,11 @@ namespace TestGame.Presenters
             PositionBlock(view, index, entry.HorizontalOffset);
             SetTowerIndex(view, index);
             _towerBlockViews.Add(view);
+
+            await _animationService.PlayPlacement(view.RectTransform);
         }
 
-        private void OnBlockRemoved(int index)
+        private async UniTaskVoid OnBlockRemovedAsync(int index)
         {
             if (index < 0 || index >= _towerBlockViews.Count)
             {
@@ -47,9 +62,41 @@ namespace TestGame.Presenters
 
             BlockView removedView = _towerBlockViews[index];
             _towerBlockViews.RemoveAt(index);
-            _blockFactory.ReturnToPool(removedView);
 
-            RepositionAllBlocks();
+            Vector3 holeWorldPosition = _holeView.HoleImageRect.position;
+            removedView.RectTransform.SetParent(_canvasRect, true);
+
+            UniTask fallTask = _animationService.PlayFallIntoHole(removedView.RectTransform, holeWorldPosition);
+            UniTask slideTask = AnimateSlideDown();
+
+            await UniTask.WhenAll(fallTask, slideTask);
+
+            _blockFactory.ReturnToPool(removedView);
+        }
+
+        private async UniTask AnimateSlideDown()
+        {
+            List<UniTask> tasks = new List<UniTask>();
+
+            for (int i = 0; i < _towerBlockViews.Count; i++)
+            {
+                float offset = _towerService.State.Blocks[i].HorizontalOffset;
+                float y = i * _blockFactory.BlockHeight;
+                Vector2 targetPos = new Vector2(offset, y);
+
+                Vector2 currentPos = _towerBlockViews[i].RectTransform.anchoredPosition;
+                if (Vector2.Distance(currentPos, targetPos) > 0.1f)
+                {
+                    tasks.Add(_animationService.PlaySlideDown(_towerBlockViews[i].RectTransform, targetPos));
+                }
+
+                SetTowerIndex(_towerBlockViews[i], i);
+            }
+
+            if (tasks.Count > 0)
+            {
+                await UniTask.WhenAll(tasks);
+            }
         }
 
         private void SetupBlockTransform(BlockView view)
@@ -64,16 +111,6 @@ namespace TestGame.Presenters
         {
             float y = index * _blockFactory.BlockHeight;
             view.RectTransform.anchoredPosition = new Vector2(horizontalOffset, y);
-        }
-
-        private void RepositionAllBlocks()
-        {
-            for (int i = 0; i < _towerBlockViews.Count; i++)
-            {
-                float offset = _towerService.State.Blocks[i].HorizontalOffset;
-                PositionBlock(_towerBlockViews[i], i, offset);
-                SetTowerIndex(_towerBlockViews[i], i);
-            }
         }
 
         private void SetTowerIndex(BlockView view, int index)

@@ -37,6 +37,7 @@ namespace TestGame.Core.Infrastructure
             builder.Register<ISaveService, JsonSaveService>(Lifetime.Singleton);
             builder.Register<IBlockFactory, BlockFactory>(Lifetime.Singleton);
             builder.Register<IDragMediator, DragMediator>(Lifetime.Singleton);
+            builder.Register<IBlockAnimationService, BlockAnimationService>(Lifetime.Singleton);
         }
 
         private void RegisterPrefabs(IContainerBuilder builder)

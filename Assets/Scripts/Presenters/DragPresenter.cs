@@ -1,4 +1,5 @@
 ﻿using R3;
+﻿using Cysharp.Threading.Tasks;
 using System;
 using TestGame.Model;
 using TestGame.Services;
@@ -17,6 +18,7 @@ namespace TestGame.Presenters
         [Inject] private readonly IDragMediator _dragMediator;
         [Inject] private readonly IBlockFactory _blockFactory;
         [Inject] private readonly ITowerService _towerService;
+        [Inject] private readonly IBlockAnimationService _animationService;
         [Inject] private readonly ScrollAreaView _scrollAreaView;
         [Inject] private readonly TowerAreaView _towerAreaView;
         [Inject] private readonly HoleView _holeView;
@@ -62,43 +64,53 @@ namespace TestGame.Presenters
                 return;
             }
 
-            _blockFactory.ReturnToPool(_currentClone);
+            BlockView clone = _currentClone;
             _currentClone = null;
 
+            HandleDropAsync(data, clone).Forget();
+        }
+
+        private async UniTaskVoid HandleDropAsync(DragEndedData data, BlockView clone)
+        {
             if (data.Source == DragSource.Scroll)
             {
-                HandleScrollBlockDrop(data);
+                await HandleScrollBlockDrop(data, clone);
             }
             else if (data.Source == DragSource.Tower)
             {
-                HandleTowerBlockDrop(data);
+                await HandleTowerBlockDrop(data, clone);
             }
         }
 
-        private void HandleScrollBlockDrop(DragEndedData data)
+        private async UniTask HandleScrollBlockDrop(DragEndedData data, BlockView clone)
         {
             bool isInTowerZone = RectTransformUtility.RectangleContainsScreenPoint(_towerAreaView.TowerZoneRect, data.ScreenPosition, _canvasCamera);
 
-            if (!isInTowerZone)
+            if (isInTowerZone && !IsTowerAtMaxHeight())
             {
-                return;
+                _blockFactory.ReturnToPool(clone);
+                float maxOffset = _blockFactory.BlockWidth * 0.5f;
+                float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
+                _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
             }
-
-            if (IsTowerAtMaxHeight())
+            else
             {
-                return;
+                await _animationService.PlayDisappear(clone.RectTransform);
+                _blockFactory.ReturnToPool(clone);
             }
-
-            float maxOffset = _blockFactory.BlockWidth * 0.5f;
-            float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
-            _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
         }
 
-        private void HandleTowerBlockDrop(DragEndedData data)
+        private async UniTask HandleTowerBlockDrop(DragEndedData data, BlockView clone)
         {
             if (IsInsideHoleEllipse(data.ScreenPosition))
             {
+                _blockFactory.ReturnToPool(clone);
                 _towerService.RemoveBlock(data.TowerIndex);
+            }
+            else
+            {
+                await _animationService.PlayDisappear(clone.RectTransform);
+                _blockFactory.ReturnToPool(clone);
             }
         }
 
