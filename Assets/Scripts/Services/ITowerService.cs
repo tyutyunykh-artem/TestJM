@@ -10,10 +10,12 @@ namespace TestGame.Services
     {
         public Observable<TowerBlockEntry> OnBlockAdded { get; }
         public Observable<int> OnBlockRemoved { get; }
+        public Observable<TowerState> OnStateRestored { get; }
 
         public TowerState State { get; }
 
         public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset);
         public void RemoveBlock(int towerIndex);
+        public void RestoreState(TowerState loadedState);
     }
 }

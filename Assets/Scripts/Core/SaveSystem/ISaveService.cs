@@ -11,5 +11,6 @@ namespace TestGame.Core.SaveSystem
         public UniTask Save(TowerState state);
         public UniTask<TowerState> Load();
         public bool HasSave();
+        public void DeleteSave();
     }
 }

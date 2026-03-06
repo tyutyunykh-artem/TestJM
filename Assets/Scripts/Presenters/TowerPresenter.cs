@@ -38,6 +38,10 @@ namespace TestGame.Presenters
             _towerService.OnBlockRemoved
                 .Subscribe(index => OnBlockRemovedAsync(index).Forget())
                 .AddTo(_disposables);
+
+            _towerService.OnStateRestored
+                .Subscribe(OnStateRestored)
+                .AddTo(_disposables);
         }
 
 
@@ -97,6 +101,31 @@ namespace TestGame.Presenters
             {
                 await UniTask.WhenAll(tasks);
             }
+        }
+
+        private void OnStateRestored(TowerState state)
+        {
+            ClearAllViews();
+
+            for (int i = 0; i < state.Blocks.Count; i++)
+            {
+                TowerBlockEntry entry = state.Blocks[i];
+                BlockView view = _blockFactory.CreateTowerBlock(entry.Data, _towerAreaView.TowerContainer);
+                SetupBlockTransform(view);
+                PositionBlock(view, i, entry.HorizontalOffset);
+                SetTowerIndex(view, i);
+                _towerBlockViews.Add(view);
+            }
+        }
+
+        private void ClearAllViews()
+        {
+            foreach (BlockView view in _towerBlockViews)
+            {
+                _blockFactory.ReturnToPool(view);
+            }
+
+            _towerBlockViews.Clear();
         }
 
         private void SetupBlockTransform(BlockView view)

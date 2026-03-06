@@ -1,4 +1,5 @@
 ﻿using TestGame.Core.Configuration;
+﻿using TestGame.Controllers;
 using TestGame.Core.SaveSystem;
 using TestGame.Presenters;
 using TestGame.Services;
@@ -21,6 +22,7 @@ namespace TestGame.Core.Infrastructure
         {
             RegisterConfiguration(builder);
             RegisterServices(builder);
+            RegisterControllers(builder);
             RegisterPrefabs(builder);
             RegisterViews(builder);
             RegisterPresenters(builder);
@@ -39,6 +41,11 @@ namespace TestGame.Core.Infrastructure
             builder.Register<IDragMediator, DragMediator>(Lifetime.Singleton);
             builder.Register<IBlockAnimationService, BlockAnimationService>(Lifetime.Singleton);
             builder.Register<IMessageService, MessageService>(Lifetime.Singleton);
+        }
+
+        private void RegisterControllers(IContainerBuilder builder)
+        {
+            builder.RegisterEntryPoint<SaveController>();
         }
 
         private void RegisterPrefabs(IContainerBuilder builder)

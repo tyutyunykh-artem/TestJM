@@ -66,5 +66,13 @@ namespace TestGame.Core.SaveSystem
         {
             return File.Exists(SavePath);
         }
+
+        public void DeleteSave()
+        {
+            if (File.Exists(SavePath))
+            {
+                File.Delete(SavePath);
+            }
+        }
     }
 }

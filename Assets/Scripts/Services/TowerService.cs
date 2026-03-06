@@ -11,11 +11,13 @@ namespace TestGame.Services
     {
         private readonly Subject<TowerBlockEntry> _onBlockAdded = new();
         private readonly Subject<int> _onBlockRemoved = new();
+        private readonly Subject<TowerState> _onStateRestored = new();
 
         private float _maxHorizontalOffset;
 
         public Observable<TowerBlockEntry> OnBlockAdded => _onBlockAdded;
         public Observable<int> OnBlockRemoved => _onBlockRemoved;
+        public Observable<TowerState> OnStateRestored => _onStateRestored;
 
         public TowerState State { get; } = new();
 
@@ -47,6 +49,17 @@ namespace TestGame.Services
             State.RemoveAt(towerIndex);
             RecalculateOffsets();
             _onBlockRemoved.OnNext(towerIndex);
+        }
+
+        public void RestoreState(TowerState loadedState)
+        {
+            State.Clear();
+            foreach (TowerBlockEntry entry in loadedState.Blocks)
+            {
+                State.AddBlock(entry);
+            }
+
+            _onStateRestored.OnNext(State);
         }
 
         private void RecalculateOffsets()
