@@ -65,6 +65,14 @@ namespace TestGame.Controllers
             {
                 state.RemoveAt(state.Blocks.Count - 1);
             }
+
+            float maxAbsoluteOffset = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
+
+            foreach (TowerBlockEntry entry in state.Blocks)
+            {
+                float clamped = Mathf.Clamp(entry.HorizontalOffset, -maxAbsoluteOffset, maxAbsoluteOffset);
+                entry.SetHorizontalOffset(clamped);
+            }
         }
 
         private async UniTaskVoid SaveAsync()

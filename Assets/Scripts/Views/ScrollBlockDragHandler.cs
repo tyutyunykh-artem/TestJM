@@ -36,7 +36,7 @@ namespace TestGame.Views
         {
             Vector2 delta = eventData.delta;
 
-            if (Mathf.Abs(delta.y) > Mathf.Abs(delta.x))
+            if (Mathf.Abs(delta.y) > Mathf.Abs(delta.x) * 0.5f)
             {
                 _isDragging = true;
                 _scrollRect.enabled = false;

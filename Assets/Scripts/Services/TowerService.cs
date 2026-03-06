@@ -21,17 +21,22 @@ namespace TestGame.Services
 
         public TowerState State { get; } = new();
 
-        public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset)
+        public TowerBlockEntry PlaceBlock(BlockData block, float maxHorizontalOffset, float maxAbsoluteOffset, float dropHorizontalOffset)
         {
             _maxHorizontalOffset = maxHorizontalOffset;
 
-            float offset = 0f;
+            float offset;
             if (State.Blocks.Count > 0)
             {
                 float previousOffset = State.GetTop().HorizontalOffset;
                 offset = previousOffset + Random.Range(-maxHorizontalOffset, maxHorizontalOffset);
-                offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
             }
+            else
+            {
+                offset = dropHorizontalOffset;
+            }
+
+            offset = Mathf.Clamp(offset, -maxAbsoluteOffset, maxAbsoluteOffset);
 
             TowerBlockEntry entry = new TowerBlockEntry(block, offset);
             State.AddBlock(entry);

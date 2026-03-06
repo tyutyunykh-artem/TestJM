@@ -100,12 +100,13 @@ namespace TestGame.Presenters
         {
             bool isInTowerZone = RectTransformUtility.RectangleContainsScreenPoint(_towerAreaView.TowerZoneRect, data.ScreenPosition, _canvasCamera);
 
-            if (isInTowerZone && !IsTowerAtMaxHeight() && _placementRule.CanPlace(data.BlockData, _towerService.State))
+            if (isInTowerZone && !IsTowerAtMaxHeight() && _placementRule.CanPlace(data.BlockData, _towerService.State) && IsDropAboveTopBlock(data.ScreenPosition))
             {
                 _blockFactory.DestroyBlock(clone);
                 float maxOffset = _blockFactory.BlockWidth * 0.5f;
                 float halfZoneWidth = _towerAreaView.TowerZoneRect.rect.width * 0.5f - _blockFactory.BlockWidth * 0.5f;
-                _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth);
+                float dropOffset = GetDropHorizontalOffset(data.ScreenPosition);
+                _towerService.PlaceBlock(data.BlockData, maxOffset, halfZoneWidth, dropOffset);
                 ShowLocalizedMessage(LocKeys.BlockPlaced).Forget();
             }
             else if (isInTowerZone && !_placementRule.CanPlace(data.BlockData, _towerService.State))
@@ -148,6 +149,23 @@ namespace TestGame.Presenters
         {
             string message = await _localizationService.GetStringFromCommon(key);
             _messageService.ShowMessage(message);
+        }
+
+        private bool IsDropAboveTopBlock(Vector2 screenPosition)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_towerAreaView.TowerContainer, screenPosition, _canvasCamera, out Vector2 localPoint);
+
+            float dropY = localPoint.y - _towerAreaView.TowerContainer.rect.yMin;
+            float blockBottomY = dropY - _blockFactory.BlockHeight * 0.5f;
+            float towerTopY = _towerService.State.Blocks.Count * _blockFactory.BlockHeight;
+            return blockBottomY >= towerTopY;
+        }
+
+        private float GetDropHorizontalOffset(Vector2 screenPosition)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_towerAreaView.TowerContainer, screenPosition, _canvasCamera, out Vector2 localPoint);
+
+            return localPoint.x - _towerAreaView.TowerContainer.rect.center.x;
         }
 
         private bool IsTowerAtMaxHeight()
