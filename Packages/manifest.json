@@ -16,9 +16,6 @@
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.9.10",
     "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.17.0",
-    "org.nuget.observablecollections": "3.3.4",
-    "org.nuget.observablecollections.r3": "3.3.4",
-    "org.nuget.r3": "1.3.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -50,14 +47,5 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  },
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "org.nuget"
-      ]
-    }
-  ]
+  }
 }
